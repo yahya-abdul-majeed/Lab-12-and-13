@@ -19,6 +19,7 @@ namespace Lab_12
             { 0.1, 0.4, -0.5 }
         };
         private double[,] CDFS = new double[3,3];
+        private int[] frequencies = new int[3];
         private Dictionary<int, string> states = new Dictionary<int, string>()
         {
             {0,"C:\\Users\\yahya\\source\\repos\\Lab 12 and 13\\Lab 12\\Images\\cloudy.png" },
@@ -27,8 +28,9 @@ namespace Lab_12
         };
         private int currentState = 0;
         private int T = 10000;
+        private int TimeSpent = 0;
         private int N = 6;
-        private int count = 0;
+        private int count;
         private Random random = new Random();
         public Form1()
         {
@@ -36,23 +38,43 @@ namespace Lab_12
             CalculateCDFs();
         }
 
-        private void btnStartStop_Click(object sender, EventArgs e)
+        private void btnStart_Click(object sender, EventArgs e)
         {
-            if(timer1.Enabled) timer1.Stop();
-            else
-            {
-                pictureBox1.SizeMode =PictureBoxSizeMode.StretchImage;
-                timer1.Interval = CalculateHoldingTimeInMilliSeconds(transitionRateMatrix[currentState,currentState]*-1);
-                pictureBox1.ImageLocation = states[currentState];
-                timer1.Start();
-            }
+            cloudyBox.Clear();
+            rainyBox.Clear();
+            sunnyBox.Clear();
+            count = 1;
+            pictureBox1.SizeMode =PictureBoxSizeMode.StretchImage;
+            timer1.Interval = CalculateHoldingTimeInMilliSeconds(transitionRateMatrix[currentState,currentState]*-1);
+            TimeSpent = timer1.Interval;
+            frequencies[currentState]++;
+            pictureBox1.ImageLocation = states[currentState];
+            timer1.Start();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            currentState = GetNextState();
-            pictureBox1.ImageLocation = states[currentState];
-            timer1.Interval = CalculateHoldingTimeInMilliSeconds(transitionRateMatrix[currentState,currentState]*-1);
+            if(TimeSpent >= T)
+            {
+                count++;
+                if(count > N)
+                {
+                    timer1.Stop();
+                    cloudyBox.Text = frequencies[0].ToString();
+                    rainyBox.Text = frequencies[1].ToString();
+                    sunnyBox.Text = frequencies[2].ToString();
+                }
+                //Reset timespent
+                TimeSpent = 0;
+            }
+            if (timer1.Enabled)
+            {
+                currentState = GetNextState();
+                pictureBox1.ImageLocation = states[currentState];
+                frequencies[currentState]++;
+                timer1.Interval = CalculateHoldingTimeInMilliSeconds(transitionRateMatrix[currentState,currentState]*-1);
+                TimeSpent += timer1.Interval;
+            }
 
         }
         private int GetNextState()
@@ -87,5 +109,6 @@ namespace Lab_12
             return (int)((-(Math.Log(random.NextDouble())) / rate)*1000);
         }
 
+       
     }
 }
