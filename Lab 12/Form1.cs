@@ -19,7 +19,7 @@ namespace Lab_12
             { 0.1, 0.4, -0.5 }
         };
         private double[,] CDFS = new double[3,3];
-        private int[] frequencies = new int[3];
+        private int[] frequencies;
         private Dictionary<int, string> states = new Dictionary<int, string>()
         {
             {0,"C:\\Users\\yahya\\source\\repos\\Lab 12 and 13\\Lab 12\\Images\\cloudy.png" },
@@ -27,9 +27,10 @@ namespace Lab_12
             {2,"C:\\Users\\yahya\\source\\repos\\Lab 12 and 13\\Lab 12\\Images\\sun.png" }
         };
         private int currentState = 0;
-        private int T = 10000;
+        private int T = 5000;
         private int TimeSpent = 0;
         private int N = 6;
+        private int totalStates;
         private int count;
         private Random random = new Random();
         public Form1()
@@ -44,6 +45,8 @@ namespace Lab_12
             rainyBox.Clear();
             sunnyBox.Clear();
             count = 1;
+            totalStates = 1;
+            frequencies = new int[3];
             pictureBox1.SizeMode =PictureBoxSizeMode.StretchImage;
             timer1.Interval = CalculateHoldingTimeInMilliSeconds(transitionRateMatrix[currentState,currentState]*-1);
             TimeSpent = timer1.Interval;
@@ -60,9 +63,9 @@ namespace Lab_12
                 if(count > N)
                 {
                     timer1.Stop();
-                    cloudyBox.Text = frequencies[0].ToString();
-                    rainyBox.Text = frequencies[1].ToString();
-                    sunnyBox.Text = frequencies[2].ToString();
+                    cloudyBox.Text = ((double)frequencies[0]/totalStates).ToString();
+                    rainyBox.Text = ((double)frequencies[1]/totalStates).ToString();
+                    sunnyBox.Text = ((double)frequencies[2]/totalStates).ToString();
                 }
                 //Reset timespent
                 TimeSpent = 0;
@@ -70,6 +73,7 @@ namespace Lab_12
             if (timer1.Enabled)
             {
                 currentState = GetNextState();
+                totalStates++;
                 pictureBox1.ImageLocation = states[currentState];
                 frequencies[currentState]++;
                 timer1.Interval = CalculateHoldingTimeInMilliSeconds(transitionRateMatrix[currentState,currentState]*-1);
